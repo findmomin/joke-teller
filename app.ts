@@ -1,18 +1,13 @@
 const button = document.getElementById('button') as HTMLButtonElement;
 
-// Global variables
-let isJokeFetching: boolean = false;
-
 // Disable/Enable Button
 const toggleButton = () => {
-  const buttonText = 'Tell Me A Joke';
-
   if (button.disabled) {
     // Enable the button
     button.disabled = false;
 
     // Change the text of the button
-    button.textContent = buttonText;
+    button.textContent = 'Tell Me A Joke';
 
     return;
   }
@@ -21,12 +16,17 @@ const toggleButton = () => {
   button.disabled = true;
 
   // Change the text of the button
-  button.textContent = `${buttonText}...`;
+  button.textContent = 'Hold On...';
 };
 
-const tellMe = (joke: string) => {
-  console.log(joke);
-};
+const tellMe = async (joke: string) =>
+  new Promise(resolve => {
+    const utterance = new SpeechSynthesisUtterance(joke);
+
+    speechSynthesis.speak(utterance);
+
+    utterance.addEventListener('end', () => resolve(null));
+  });
 
 // Get jokes from Joke API
 const getJokes = async () => {
@@ -49,15 +49,13 @@ const getJokes = async () => {
     }
 
     // Outputting the joke as audio
-    tellMe(joke);
+    await tellMe(joke);
 
     // Enable the Button
     toggleButton();
   } catch (err) {
     // Catch Error Here
     alert(err);
-
-    console.log('fuck');
 
     // Enable the Button
     toggleButton();
